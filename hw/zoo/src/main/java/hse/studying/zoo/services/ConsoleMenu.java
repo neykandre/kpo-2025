@@ -1,22 +1,15 @@
 package hse.studying.zoo.services;
 
-import hse.studying.zoo.domains.Animal;
-import hse.studying.zoo.domains.Computer;
-import hse.studying.zoo.domains.Herbo;
-import hse.studying.zoo.domains.Monkey;
-import hse.studying.zoo.domains.Rabbit;
-import hse.studying.zoo.domains.Table;
-import hse.studying.zoo.domains.Thing;
-import hse.studying.zoo.domains.Tiger;
-import hse.studying.zoo.domains.Wolf;
+import hse.studying.zoo.domains.*;
 import hse.studying.zoo.factories.HerbivoreFactory;
 import hse.studying.zoo.factories.PredatorFactory;
 import hse.studying.zoo.factories.ThingFactory;
 import hse.studying.zoo.params.HerbivoreParams;
 import hse.studying.zoo.params.PredatorParams;
 import hse.studying.zoo.params.ThingParams;
-import java.util.Scanner;
 import org.springframework.stereotype.Component;
+
+import java.util.Scanner;
 
 /**
  * Provides a command-line interface for interacting with the zoo.
@@ -68,7 +61,7 @@ public class ConsoleMenu {
             System.out.println("2. Show all animals");
             System.out.println("3. Show total food consumption");
             System.out.println("4. Show animals for petting zoo");
-            System.out.println("5. Add inventory");
+            System.out.println("5. Add thing");
             System.out.println("6. Show inventory");
             System.out.println("7. Exit");
             int choice = scanner.nextInt();
@@ -93,7 +86,7 @@ public class ConsoleMenu {
      * creates an animal of the entered type and adds it to the zoo.
      */
     private void addAnimal() {
-        System.out.print("Enter animal type: ");
+        System.out.print("Enter animal type (tiger, wolf, monkey, rabbit): ");
         String type = scanner.next();
         System.out.print("Is the animal a herbivore or a predator? (h/p): ");
         String category = scanner.next().toLowerCase();
@@ -114,7 +107,7 @@ public class ConsoleMenu {
             if (zoo.addAnimal(animal)) {
                 System.out.println(type + " added to the zoo.");
             } else {
-                System.out.println(type + "  was not added. Did not pass the health test at the clinic.");
+                System.out.println(type + " was not added. Did not pass the health test at the clinic.");
             }
         } catch (IllegalArgumentException e) {
             System.out.println(type + " was not added. " + e.getMessage());
@@ -128,7 +121,11 @@ public class ConsoleMenu {
         if (zoo.getAnimals().isEmpty()) {
             System.out.println("No animals in the zoo.");
         } else {
-            zoo.getAnimals().forEach(System.out::println);
+            zoo.getAnimals().forEach(animal -> System.out.println(animal.getClass().getSimpleName()
+                    + "\n Food consumption: " + animal.getFoodConsumption() + " kg per day"
+                    + "\n Weight: " + animal.getWeight() + " kg" +
+                    (animal instanceof Herbo ? "\n Kindness level: " + ((Herbo) animal).getKindness() : "") +
+                    "\n"));
         }
     }
 
@@ -148,14 +145,19 @@ public class ConsoleMenu {
     private void showContactZooAnimals() {
         System.out.println("Animals for petting zoo:");
         zoo.getAnimals().stream().filter(animal -> animal instanceof Herbo
-                && ((Herbo) animal).getKindness() > 5).forEach(System.out::println);
+                && ((Herbo) animal).getKindness() > 5).forEach(animal ->
+                System.out.println(animal.getClass().getSimpleName()
+                        + "\n Food consumption: " + animal.getFoodConsumption() + " kg per day"
+                        + "\n Weight: " + animal.getWeight() + " kg" +
+                        "\n Kindness level: " + ((Herbo) animal).getKindness() +
+                        "\n"));
     }
 
     /**
      * Asks user to enter thing type and adds it to the inventory.
      */
     private void addThing() {
-        System.out.print("Enter thing type: ");
+        System.out.print("Enter thing type (computer, table): ");
         String type = scanner.next();
 
         Thing thing = thingFactory.create(type, new ThingParams(inventoryItems++));

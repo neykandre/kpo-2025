@@ -1,6 +1,7 @@
 package hse.studying.zoo.services;
 
 import hse.studying.zoo.domains.Animal;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 /**
@@ -8,7 +9,7 @@ import org.springframework.stereotype.Service;
  * It provides a method to check if the animal is healthy or not.
  * An animal is healthy if its food consumption is more than 10% of its weight.
  */
-@Service
+@Component
 public class Clinic {
     public boolean isHealthy(Animal animal) {
         return animal.getWeight() > 0 && animal.getFoodConsumption() >= animal.getWeight() * 0.1;
