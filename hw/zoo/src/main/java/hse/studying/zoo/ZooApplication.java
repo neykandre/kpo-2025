@@ -11,20 +11,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * The application is a Spring Boot application.
  */
 @SpringBootApplication
-public class ZooApplication implements CommandLineRunner {
-
-    private final ConsoleMenu consoleMenu;
-
-    public ZooApplication(ConsoleMenu consoleMenu) {
-        this.consoleMenu = consoleMenu;
-    }
+public class ZooApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(ZooApplication.class, args);
-    }
+        var appContext = SpringApplication.run(ZooApplication.class, args);
 
-    @Override
-    public void run(String... args) {
-        consoleMenu.start();
+        ConsoleMenu menu = appContext.getBean(ConsoleMenu.class);
+        menu.start();
     }
 }
