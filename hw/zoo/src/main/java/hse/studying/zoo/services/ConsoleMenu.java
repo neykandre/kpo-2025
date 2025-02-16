@@ -1,16 +1,22 @@
 package hse.studying.zoo.services;
 
-import hse.studying.zoo.domains.*;
+import hse.studying.zoo.domains.Animal;
+import hse.studying.zoo.domains.Computer;
+import hse.studying.zoo.domains.Herbo;
+import hse.studying.zoo.domains.Monkey;
+import hse.studying.zoo.domains.Rabbit;
+import hse.studying.zoo.domains.Table;
+import hse.studying.zoo.domains.Thing;
+import hse.studying.zoo.domains.Tiger;
+import hse.studying.zoo.domains.Wolf;
 import hse.studying.zoo.factories.HerbivoreFactory;
 import hse.studying.zoo.factories.PredatorFactory;
 import hse.studying.zoo.factories.ThingFactory;
 import hse.studying.zoo.params.HerbivoreParams;
 import hse.studying.zoo.params.PredatorParams;
 import hse.studying.zoo.params.ThingParams;
-import org.springframework.stereotype.Component;
-
 import java.util.Scanner;
-
+import org.springframework.stereotype.Component;
 /**
  * Provides a command-line interface for interacting with the zoo.
  * Allows users to add animals and things to the zoo, view the list of animals,
