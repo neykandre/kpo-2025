@@ -2,6 +2,8 @@ package hse.kpo.storages;
 
 import hse.kpo.domains.Car;
 import hse.kpo.domains.Customer;
+import hse.kpo.enums.ProductionTypes;
+import hse.kpo.interfaces.AddingObserver;
 import hse.kpo.interfaces.cars.CarFactory;
 import hse.kpo.interfaces.cars.CarProvider;
 import java.util.ArrayList;
@@ -13,6 +15,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class CarStorage implements CarProvider {
+
+    private final List<AddingObserver> observers = new ArrayList<AddingObserver>();
 
     private final List<Car> cars = new ArrayList<>();
 
@@ -43,5 +47,15 @@ public class CarStorage implements CarProvider {
         );
 
         cars.add(car);
+
+        notifyObserversForAdd(ProductionTypes.CAR, car.getVin());
+    }
+
+    public void addObserver(AddingObserver observer) {
+        observers.add(observer);
+    }
+
+    public void notifyObserversForAdd(ProductionTypes productType, int vin) {
+        observers.forEach(observer -> observer.onAdd(productType, vin));
     }
 }
