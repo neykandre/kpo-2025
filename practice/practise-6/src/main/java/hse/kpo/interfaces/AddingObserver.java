@@ -1,4 +1,7 @@
 package hse.kpo.interfaces;
 
-public interface AddObserver {
+import hse.kpo.enums.ProductionTypes;
+
+public interface AddingObserver {
+    void onAdd(ProductionTypes productType, int vin);
 }

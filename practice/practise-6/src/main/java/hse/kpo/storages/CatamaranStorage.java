@@ -2,6 +2,8 @@ package hse.kpo.storages;
 
 import hse.kpo.domains.Catamaran;
 import hse.kpo.domains.Customer;
+import hse.kpo.enums.ProductionTypes;
+import hse.kpo.interfaces.AddingObserver;
 import hse.kpo.interfaces.catamarans.CatamaranFactory;
 import hse.kpo.interfaces.catamarans.CatamaranProvider;
 import java.util.ArrayList;
@@ -14,9 +16,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class CatamaranStorage implements CatamaranProvider {
 
+    private final List<AddingObserver> observers = new ArrayList<AddingObserver>();
+
     private final List<Catamaran> catamarans = new ArrayList<>();
 
-    private int carNumberCounter = 0;
+    private int catamaranNumberCounter = 0;
+
+    public CatamaranStorage() {
+    }
 
     @Override
     public Catamaran takeCatamaran(Customer customer) {
@@ -38,11 +45,21 @@ public class CatamaranStorage implements CatamaranProvider {
      */
     public <ProductionParams> void addCatamaran(CatamaranFactory<ProductionParams> catamaranFactory,
                                                 ProductionParams catamaranParams) {
-        var car = catamaranFactory.create(
+        var catamaran = catamaranFactory.create(
                 catamaranParams,
-                ++carNumberCounter
+                ++catamaranNumberCounter
         );
 
-        catamarans.add(car);
+        catamarans.add(catamaran);
+
+        notifyObserversForAdd(ProductionTypes.CATAMARAN, catamaran.getVin());
+    }
+
+    public void addObserver(AddingObserver observer) {
+        observers.add(observer);
+    }
+
+    public void notifyObserversForAdd(ProductionTypes productType, int vin) {
+        observers.forEach(observer -> observer.onAdd(productType, vin));
     }
 }

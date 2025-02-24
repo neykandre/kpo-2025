@@ -43,7 +43,7 @@ public class HseCarService {
                         customer.setCar(car);
                         notifyObserversForSale(customer, ProductionTypes.CAR, car.getVin());
                     } else {
-                        log.warn("No car in CarService");
+                        log.debug("No car in CarService");
                     }
                 });
     }
