@@ -4,6 +4,7 @@ import hse.kpo.builders.ReportBuilder;
 import hse.kpo.domains.Customer;
 import hse.kpo.factories.cars.HandCarFactory;
 import hse.kpo.factories.cars.PedalCarFactory;
+import hse.kpo.observers.ReportSalesObserver;
 import hse.kpo.params.EmptyEngineParams;
 import hse.kpo.params.PedalEngineParams;
 import hse.kpo.storages.CarStorage;
@@ -33,6 +34,9 @@ class KpoApplicationTests {
 	@Autowired
 	private HandCarFactory handCarFactory;
 
+	@Autowired
+	private ReportSalesObserver reportSalesObserver;
+
 	@Test
 	@DisplayName("Тест загрузки контекста")
 	void contextLoads() {
@@ -57,20 +61,13 @@ class KpoApplicationTests {
 
 		customerStorage.getCustomers().stream().map(Customer::toString).forEach(System.out::println);
 
-		var reportBuilder = new ReportBuilder()
-				.addOperation("Инициализация системы")
-				.addCustomers(customerStorage.getCustomers());
-
+		hseCarService.addObserver(reportSalesObserver);
 		hseCarService.sellCars();
 
 		customerStorage.getCustomers().stream().map(Customer::toString).forEach(System.out::println);
-		var report = reportBuilder
-				.addOperation("Продажа автомобилей")
-				.addCustomers(customerStorage.getCustomers())
-				.build();
 
 		System.out.println();
-		System.out.println(report.toString());
+		System.out.println(reportSalesObserver.buildReport().toString());
 	}
 
 }
