@@ -49,6 +49,13 @@ public class ReportBuilder {
         return this;
     }
 
+    public ReportBuilder addCatamarans(List<Catamaran> catamarans) {
+        content.append("Катамараны:");
+        catamarans.forEach(catamaran -> content.append(String.format(" - %s", catamaran)));
+        content.append("\n");
+        return this;
+    }
+
     /**
      * Метод получения итогового отчета о системе.
      *
