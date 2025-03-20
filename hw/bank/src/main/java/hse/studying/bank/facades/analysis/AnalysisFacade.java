@@ -27,7 +27,7 @@ public class AnalysisFacade {
             BankAccount bankAccount, Date startDate,
             Date endDate) {
         return StreamSupport.stream(operationFacade.getOperations().spliterator(), false)
-                .filter(operation -> operation.getBankAccount().equals(bankAccount))
+                .filter(operation -> operation.getBankAccount().getId().equals(bankAccount.getId()))
                 .filter(operation -> operation.getDate().after(startDate) && operation.getDate()
                         .before(endDate))
                 .mapToDouble(operation -> operation.getType() == TransferType.INCOME
@@ -40,7 +40,7 @@ public class AnalysisFacade {
             BankAccount bankAccount, Date startDate,
             Date endDate) {
         return StreamSupport.stream(operationFacade.getOperations().spliterator(), false)
-                .filter(operation -> operation.getBankAccount().equals(bankAccount))
+                .filter(operation -> operation.getBankAccount().getId().equals(bankAccount.getId()))
                 .filter(operation -> operation.getDate().after(startDate) && operation.getDate()
                         .before(endDate))
                 .filter(operation -> operation.getType() == TransferType.INCOME)
@@ -54,7 +54,7 @@ public class AnalysisFacade {
             BankAccount bankAccount,
             Date startDate, Date endDate) {
         return StreamSupport.stream(operationFacade.getOperations().spliterator(), false)
-                .filter(operation -> operation.getBankAccount().equals(bankAccount))
+                .filter(operation -> operation.getBankAccount().getId().equals(bankAccount.getId()))
                 .filter(operation -> operation.getDate().after(startDate) && operation.getDate()
                         .before(endDate))
                 .filter(operation -> operation.getType() == TransferType.OUTCOME)

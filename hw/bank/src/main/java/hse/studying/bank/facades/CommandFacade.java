@@ -113,6 +113,6 @@ public class CommandFacade {
     }
 
     public RecalculateBalanceCommand recalculateBalanceCommand() {
-        return new RecalculateBalanceCommand(managementFacade);
+        return new RecalculateBalanceCommand(bankAccountFacade, managementFacade);
     }
 }
