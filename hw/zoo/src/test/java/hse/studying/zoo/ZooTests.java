@@ -70,6 +70,4 @@ class ZooTests {
     void testAddUnregisteredAnimal() {
         assertThrows(IllegalArgumentException.class, () -> herbivoreFactory.create("UnregisteredAnimal", new HerbivoreParams(1, 1, 1, 1)));
     }
-
-
 }
