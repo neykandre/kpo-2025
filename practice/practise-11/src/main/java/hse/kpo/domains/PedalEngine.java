@@ -2,6 +2,8 @@ package hse.kpo.domains;
 
 import hse.kpo.enums.ProductionTypes;
 import hse.kpo.interfaces.Engine;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -10,8 +12,14 @@ import lombok.ToString;
  */
 @ToString
 @Getter
-public class PedalEngine implements Engine {
+@Entity
+@DiscriminatorValue("PEDAL")
+public class PedalEngine extends AbstractEngine {
     private final int size;
+
+    public PedalEngine() {
+        this.size = 0;
+    }
 
     @Override
     public boolean isCompatible(Customer customer, ProductionTypes type) {
