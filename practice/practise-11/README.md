@@ -67,8 +67,6 @@ public class PedalEngine extends AbstractEngine {
 Класс Car преобразован в сущность JPA со связью @OneToOne к AbstractEngine.
 Конструктор будет выдавать ошибки, исправьте так, чтобы все было работало.
 ```
-@Getter
-@Setter
 @Entity
 @Table(name = "cars")
 @ToString
@@ -344,17 +342,13 @@ spring:
   application:
     name: products-api
   datasource:
-    url: jdbc:postgresql://localhost:5432/car_db
-    username: postgres
-    password: postgres
-#    url: ${SPRING_DATASOURCE_URL}
-#    username: ${SPRING_DATASOURCE_USERNAME}
-#    password: ${SPRING_DATASOURCE_PASSWORD}
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: update
-#      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO}
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO}
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
