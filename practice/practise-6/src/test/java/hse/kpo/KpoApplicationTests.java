@@ -4,6 +4,8 @@ import hse.kpo.builders.ReportBuilder;
 import hse.kpo.domains.Customer;
 import hse.kpo.factories.cars.HandCarFactory;
 import hse.kpo.factories.cars.PedalCarFactory;
+import hse.kpo.observers.ReportAddingObserver;
+import hse.kpo.observers.ReportSalesObserver;
 import hse.kpo.params.EmptyEngineParams;
 import hse.kpo.params.PedalEngineParams;
 import hse.kpo.storages.CarStorage;
@@ -33,6 +35,12 @@ class KpoApplicationTests {
 	@Autowired
 	private HandCarFactory handCarFactory;
 
+	@Autowired
+	private ReportSalesObserver reportSalesObserver;
+
+	@Autowired
+	private ReportAddingObserver reportAddingObserver;
+
 	@Test
 	@DisplayName("Тест загрузки контекста")
 	void contextLoads() {
@@ -49,28 +57,26 @@ class KpoApplicationTests {
 		customerStorage.addCustomer(Customer.builder().name("Petya").legPower(6).handPower(6).build());
 		customerStorage.addCustomer(Customer.builder().name("Nikita").legPower(4).handPower(4).build());
 
+		carStorage.addObserver(reportAddingObserver);
+
 		carStorage.addCar(pedalCarFactory, new PedalEngineParams(6));
 		carStorage.addCar(pedalCarFactory, new PedalEngineParams(6));
 
 		carStorage.addCar(handCarFactory, EmptyEngineParams.DEFAULT);
 		carStorage.addCar(handCarFactory, EmptyEngineParams.DEFAULT);
+
+		System.out.println(reportAddingObserver.buildReport().toString());
+		System.out.println();
 
 		customerStorage.getCustomers().stream().map(Customer::toString).forEach(System.out::println);
 
-		var reportBuilder = new ReportBuilder()
-				.addOperation("Инициализация системы")
-				.addCustomers(customerStorage.getCustomers());
-
+		hseCarService.addObserver(reportSalesObserver);
 		hseCarService.sellCars();
 
 		customerStorage.getCustomers().stream().map(Customer::toString).forEach(System.out::println);
-		var report = reportBuilder
-				.addOperation("Продажа автомобилей")
-				.addCustomers(customerStorage.getCustomers())
-				.build();
 
 		System.out.println();
-		System.out.println(report.toString());
+		System.out.println(reportSalesObserver.buildReport().toString());
 	}
 
 }
