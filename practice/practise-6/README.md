@@ -10,46 +10,23 @@
 ## Пояснения к реализации
 Для создания наблюдателей добавьте список в класс, который будем мониторить 
 ```
-final List<SalesObserver> observers = new ArrayList<>();
-```
 
-Для добавление наблюдателя создайте метод
 ```
+final List<SalesObserver> observers = new ArrayList<>();
+
+Для добавление наблюдателя поставьте метод
 public void addObserver(SalesObserver observer) {
-    observers.add(observer);
+observers.add(observer);
 }
-```
 
 Для реализации оповещений используйте
-```
 private void notifyObserversForSale(Customer customer, ProductionTypes productType, int vin) {
     observers.forEach(obs -> obs.onSale(customer, productType, vin));
 }
-```
 
 Добавьте метод оповещения в продажу машин
-```
 notifyObserversForSale(customer, ProductionTypes.CAR, car.getVin());
-```
 
-Теперь можно не добавлять вручную в отчет информацию о пользователях. 
-Но необходимо добавлять и операции. Для этого:
-
-В Gradle добавьте поддержку работы аннотаций
-```
-implementation("org.springframework.boot:spring-boot-starter-aop")
-```
-
-Создайте аннотацию Sales
-```
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-public @interface Sales {
-    String value() default "";
-}
-```
-
-```
 @Component
 @Aspect
 @RequiredArgsConstructor
@@ -71,8 +48,12 @@ private final SalesObserver salesObserver;
         }
     }
 }
-```
 
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface Sales {
+String value() default "";
+}
 
 @Component
 @RequiredArgsConstructor
@@ -100,7 +81,8 @@ private final CustomerStorage customerStorage;
     }
 }
 
-
+В Gradle добавьте поддержку работы аннотаций
+implementation("org.springframework.boot:spring-boot-starter-aop")
 
 
 <details> 
