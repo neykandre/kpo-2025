@@ -98,13 +98,6 @@ class CarControllerTest {
     }
 }
 ```
-```
-public record CarResponse(
-Integer vin,
-String engineType,
-Integer pedalSize
-) {}
-```
 <details> 
 <summary>Ссылки</summary>
 1. 
