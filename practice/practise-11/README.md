@@ -1,4 +1,4 @@
-# Занятие 11. БД
+# Занятие 8. DDD
 
 ## Цель занятия
 - Научиться работать с базой данных.
@@ -312,20 +312,19 @@ public class CarController {
     }
 }
 ```
-Добавьте конфигурацию 
 Добавьте конфигурацию в application.yml
 ```
 spring:
   application:
     name: products-api
   datasource:
-    url: ${SPRING_DATASOURCE_URL}
-    username: ${SPRING_DATASOURCE_USERNAME}
-    password: ${SPRING_DATASOURCE_PASSWORD}
+    url: jdbc:postgresql://postgres:5432/hse_db
+    username: postgres
+    password: postgres
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO}
+      ddl-auto: update
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
@@ -333,7 +332,6 @@ spring:
 server:
   port: 8080
 ```
-
 <details> 
 <summary>Ссылки</summary>
 1. 
