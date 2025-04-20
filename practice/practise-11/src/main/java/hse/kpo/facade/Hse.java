@@ -12,12 +12,12 @@ import hse.kpo.factories.TransportExporterFactory;
 import hse.kpo.factories.cars.*;
 import hse.kpo.factories.catamarans.*;
 import hse.kpo.interfaces.Transport;
-import hse.kpo.interfaces.cars.CarRepository;
 import hse.kpo.params.EmptyEngineParams;
 import hse.kpo.params.PedalEngineParams;
 import hse.kpo.export.reports.ReportExporter;
 import hse.kpo.services.cars.HseCarService;
 import hse.kpo.services.catamarans.HseCatamaranService;
+import hse.kpo.storages.CarStorage;
 import hse.kpo.storages.CatamaranStorage;
 import hse.kpo.storages.CustomerStorage;
 import hse.kpo.observers.SalesObserver;
@@ -39,6 +39,7 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class Hse {
     private final CustomerStorage customerStorage;
+    private final CarStorage carStorage;
     private final CatamaranStorage catamaranStorage;
     private final HseCarService carService;
     private final HseCatamaranService catamaranService;
@@ -91,24 +92,25 @@ public class Hse {
      * @param pedalSize размер педалей (1-15)
      */
     public Car addPedalCar(int pedalSize) {
-        return carService.addCar(pedalCarFactory, new PedalEngineParams(pedalSize));
+        return carStorage.addCar(pedalCarFactory, new PedalEngineParams(pedalSize));
     }
 
     /**
      * Добавляет автомобиль с ручным приводом.
      */
     public Car addHandCar() {
-        return carService.addCar(handCarFactory, EmptyEngineParams.DEFAULT);
+        return carStorage.addCar(handCarFactory, EmptyEngineParams.DEFAULT);
     }
 
     /**
      * Добавляет левитирующий автомобиль.
      */
     public Car addLevitationCar() {
-        return carService.addCar(levitationCarFactory, EmptyEngineParams.DEFAULT);
+        return carStorage.addCar(levitationCarFactory, EmptyEngineParams.DEFAULT);
     }
 
-    public void addWheelCatamaran() {carService.addExistingCar(new CatamaranWithWheels(createCatamaran()));
+    public void addWheelCatamaran() {
+        carStorage.addExistingCar(new CatamaranWithWheels(createCatamaran()));
     }
 
     private Catamaran createCatamaran() {
@@ -167,7 +169,7 @@ public class Hse {
 
     public void exportTransport(ReportFormat format, Writer writer) {
         List<Transport> transports = Stream.concat(
-                carService.getCars().stream(),
+                carStorage.getCars().stream(),
                 catamaranStorage.getCatamarans().stream())
                 .toList();
         TransportExporter exporter = transportExporterFactory.create(format);

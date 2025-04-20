@@ -2,8 +2,6 @@ package hse.kpo.domains;
 
 import hse.kpo.enums.ProductionTypes;
 import hse.kpo.interfaces.Engine;
-import jakarta.persistence.DiscriminatorValue;
-import jakarta.persistence.Entity;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
@@ -12,9 +10,7 @@ import lombok.ToString;
  */
 @NoArgsConstructor
 @ToString
-@Entity
-@DiscriminatorValue("HAND")
-public class HandEngine extends AbstractEngine {
+public class HandEngine implements Engine {
     @Override
     public boolean isCompatible(Customer customer, ProductionTypes type) {
         return switch (type) {

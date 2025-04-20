@@ -1,6 +1,5 @@
 package hse.kpo.controllers.cars;
 
-import hse.kpo.domains.AbstractEngine;
 import hse.kpo.domains.HandEngine;
 import hse.kpo.domains.LevitationEngine;
 import hse.kpo.domains.PedalEngine;
@@ -8,39 +7,37 @@ import hse.kpo.domains.cars.Car;
 import hse.kpo.dto.request.CarRequest;
 import hse.kpo.enums.EngineTypes;
 import hse.kpo.facade.Hse;
+import hse.kpo.interfaces.Engine;
 import hse.kpo.services.cars.HseCarService;
+import hse.kpo.storages.CarStorage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/cars")
 @RequiredArgsConstructor
 @Tag(name = "Автомобили", description = "Управление транспортными средствами")
 public class CarController {
+    private final CarStorage carStorage;
     private final HseCarService carService;
     private final Hse hseFacade;
 
     @GetMapping("/{vin}")
     @Operation(summary = "Получить автомобиль по VIN")
     public ResponseEntity<Car> getCarByVin(@PathVariable int vin) {
-        return carService.findByVin(vin)
+        return carStorage.getCars().stream()
+                .filter(car -> car.getVin() == vin)
+                .findFirst()
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -53,15 +50,13 @@ public class CarController {
             BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     bindingResult.getAllErrors().get(0).getDefaultMessage());
         }
 
         var engineType = EngineTypes.find(request.engineType());
         if (engineType.isEmpty()) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "No this type");
         }
 
@@ -84,12 +79,19 @@ public class CarController {
 
     @PostMapping("/sell/{vin}")
     @Operation(summary = "Продать автомобиль по VIN")
-    public ResponseEntity<Object> sellCar(@PathVariable int vin) {
-        return carService.findByVin(vin).map(car -> {
-            carService.deleteByVin(car.getVin());
+    public ResponseEntity<Void> sellCar(@PathVariable int vin) {
+        var carOptional = carStorage.getCars().stream()
+                .filter(c -> c.getVin() == vin)
+                .findFirst();
+
+        if (carOptional.isPresent()) {
+            var car = carOptional.get();
+            carStorage.getCars().remove(car);
+            // Логика продажи (упрощенно)
             hseFacade.sell();
             return ResponseEntity.ok().build();
-        }).orElse(ResponseEntity.notFound().build());
+        }
+        return ResponseEntity.notFound().build();
     }
 
     @PutMapping("/{vin}")
@@ -98,11 +100,14 @@ public class CarController {
             @PathVariable int vin,
             @Valid @RequestBody CarRequest request) {
 
-        return carService.findByVin(vin)
+        return carStorage.getCars().stream()
+                .filter(car -> car.getVin() == vin)
+                .findFirst()
                 .map(existingCar -> {
-                    existingCar.setEngine(createEngineFromRequest(request));
-                    carService.addExistingCar(existingCar);
-                    return ResponseEntity.ok(existingCar);
+                    var updatedCar = createCarFromRequest(request, vin);
+                    carStorage.getCars().remove(existingCar);
+                    carStorage.addExistingCar(updatedCar);
+                    return ResponseEntity.ok(updatedCar);
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -110,8 +115,8 @@ public class CarController {
     @DeleteMapping("/{vin}")
     @Operation(summary = "Удалить автомобиль")
     public ResponseEntity<Void> deleteCar(@PathVariable int vin) {
-        carService.deleteByVin(vin);
-        return ResponseEntity.ok().build();
+        boolean removed = carStorage.getCars().removeIf(car -> car.getVin() == vin);
+        return removed ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
 
     @GetMapping
@@ -124,14 +129,18 @@ public class CarController {
             @RequestParam(required = false) String engineType,
             @RequestParam(required = false) Integer minVin) {
 
-        return carService.getCarsWithFiltration(engineType, minVin);
+        return carStorage.getCars().stream()
+                .filter(car -> engineType == null || car.getEngineType().equals(engineType))
+                .filter(car -> minVin == null || car.getVin() >= minVin)
+                .toList();
     }
 
-    private AbstractEngine createEngineFromRequest(CarRequest request) {
-        return switch (EngineTypes.valueOf(request.engineType())) {
+    private Car createCarFromRequest(CarRequest request, int vin) {
+        Engine engine = switch (EngineTypes.valueOf(request.engineType())) {
             case PEDAL -> new PedalEngine(request.pedalSize());
             case HAND -> new HandEngine();
             case LEVITATION -> new LevitationEngine();
         };
+        return new Car(vin, engine);
     }
 }

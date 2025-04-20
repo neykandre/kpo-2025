@@ -7,7 +7,7 @@ public class CatamaranWithWheels extends Car {
     private final Catamaran catamaran;
 
     public CatamaranWithWheels(Catamaran catamaran) {
-        super(catamaran.getVin() + 10000, (AbstractEngine) catamaran.getEngine());
+        super(catamaran.getVin() + 10000, catamaran.getEngine());
         this.catamaran = catamaran;
     }
 

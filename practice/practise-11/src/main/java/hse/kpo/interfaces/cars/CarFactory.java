@@ -12,7 +12,8 @@ public interface CarFactory<T> {
      * Метод создания машин.
      *
      * @param carParams параметры для создания
+     * @param carNumber номер
      * @return {@link Car}
      */
-    Car create(T carParams);
+    Car create(T carParams, int carNumber);
 }

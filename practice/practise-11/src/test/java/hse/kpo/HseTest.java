@@ -7,6 +7,7 @@ import hse.kpo.facade.Hse;
 import hse.kpo.factories.cars.HandCarFactory;
 import hse.kpo.factories.cars.PedalCarFactory;
 import hse.kpo.observers.SalesObserver;
+import hse.kpo.storages.CarStorage;
 import hse.kpo.storages.CustomerStorage;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,6 +30,9 @@ class HseTest {
 
     @Autowired
     private CustomerStorage customerStorage;
+
+    @Autowired
+    private CarStorage carStorage;
 
     @Autowired
     private PedalCarFactory pedalCarFactory;

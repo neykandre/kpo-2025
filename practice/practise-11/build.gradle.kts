@@ -49,9 +49,6 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-aop")
 
 	implementation("com.fasterxml.jackson.core:jackson-databind:2.18.2")
-
-	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-	runtimeOnly("org.postgresql:postgresql")
 }
 
 tasks.withType<Test> {

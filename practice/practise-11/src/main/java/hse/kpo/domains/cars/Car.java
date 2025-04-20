@@ -1,6 +1,5 @@
 package hse.kpo.domains.cars;
 
-import hse.kpo.domains.AbstractEngine;
 import hse.kpo.domains.Customer;
 import hse.kpo.domains.HandEngine;
 import hse.kpo.domains.LevitationEngine;
@@ -9,46 +8,25 @@ import hse.kpo.enums.EngineTypes;
 import hse.kpo.enums.ProductionTypes;
 import hse.kpo.interfaces.Engine;
 import hse.kpo.interfaces.Transport;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.ToString;
 
 /**
  * Класс хранящий информацию о машине.
  */
-@Getter
-@Setter
-@Entity
-@Table(name = "cars")
 @ToString
 @NoArgsConstructor
 public class Car implements Transport {
 
     @Getter
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int vin;
+    private Engine engine;
 
     @Getter
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "engine_id")
-    private AbstractEngine engine;
+    private int vin;
 
-    public Car(int vin, AbstractEngine engine) {
+    public Car(int vin, Engine engine) {
         this.vin = vin;
-        this.engine = engine;
-    }
-
-    public Car(AbstractEngine engine) {
         this.engine = engine;
     }
 
