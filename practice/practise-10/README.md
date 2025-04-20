@@ -78,23 +78,16 @@ class CarControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-   @Test
-    @DisplayName("Создание педального автомобиля с валидными параметрами")
-    void createPedalCar_ValidData_Returns2012() throws Exception {
+    @Test
+    @DisplayName("Создание автомобиля с педальным двигателем и валидными параметрами")
+    void createPedalCar_ValidData_Returns201() throws Exception {
         CarRequest request = new CarRequest("PEDAL", 10);
-
-        String responseJson = mockMvc.perform(post("/api/cars")
+        mockMvc.perform(post("/api/cars")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
-                .andReturn().getResponse().getContentAsString();
-
-        CarResponse response = objectMapper.readValue(responseJson, CarResponse.class);
-        assertAll(
-                () -> assertNotNull(response.vin(), "VIN должен быть присвоен"),
-                () -> assertEquals(EngineTypes.PEDAL.name(), response.engineType(),
-                        "Тип двигателя должен быть PEDAL")
-        );
+                .andExpect(jsonPath("$.vin").isNumber())
+                .andExpect(jsonPath("$.engineType").value("PEDAL"));
     }
 }
 ```
