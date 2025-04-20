@@ -1,7 +1,5 @@
-package hse.kpo.domains.catamarans;
+package hse.kpo.domains;
 
-import hse.kpo.domains.AbstractEngine;
-import hse.kpo.domains.Customer;
 import hse.kpo.domains.cars.Car;
 import hse.kpo.enums.ProductionTypes;
 
@@ -9,12 +7,13 @@ public class CatamaranWithWheels extends Car {
     private final Catamaran catamaran;
 
     public CatamaranWithWheels(Catamaran catamaran) {
-        super((AbstractEngine) catamaran.getEngine());
+        super(catamaran.getVin() + 10000, (AbstractEngine) catamaran.getEngine());
         this.catamaran = catamaran;
     }
 
     @Override
     public boolean isCompatible(Customer customer) {
+        // Используем проверку совместимости для автомобилей
         return this.catamaran.getEngine().isCompatible(customer, ProductionTypes.CATAMARAN);
     }
 

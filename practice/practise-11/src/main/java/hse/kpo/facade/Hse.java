@@ -1,7 +1,7 @@
 package hse.kpo.facade;
 
-import hse.kpo.domains.catamarans.Catamaran;
-import hse.kpo.domains.catamarans.CatamaranWithWheels;
+import hse.kpo.domains.Catamaran;
+import hse.kpo.domains.CatamaranWithWheels;
 import hse.kpo.domains.Customer;
 import hse.kpo.domains.Report;
 import hse.kpo.domains.cars.Car;
@@ -12,11 +12,13 @@ import hse.kpo.factories.TransportExporterFactory;
 import hse.kpo.factories.cars.*;
 import hse.kpo.factories.catamarans.*;
 import hse.kpo.interfaces.Transport;
+import hse.kpo.interfaces.cars.CarRepository;
 import hse.kpo.params.EmptyEngineParams;
 import hse.kpo.params.PedalEngineParams;
 import hse.kpo.export.reports.ReportExporter;
 import hse.kpo.services.cars.HseCarService;
 import hse.kpo.services.catamarans.HseCatamaranService;
+import hse.kpo.storages.CatamaranStorage;
 import hse.kpo.storages.CustomerStorage;
 import hse.kpo.observers.SalesObserver;
 import jakarta.annotation.PostConstruct;
@@ -37,6 +39,7 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class Hse {
     private final CustomerStorage customerStorage;
+    private final CatamaranStorage catamaranStorage;
     private final HseCarService carService;
     private final HseCatamaranService catamaranService;
     private final SalesObserver salesObserver;
@@ -105,16 +108,16 @@ public class Hse {
         return carService.addCar(levitationCarFactory, EmptyEngineParams.DEFAULT);
     }
 
-    public Car addWheelCatamaran() { return carService.addExistingCar(new CatamaranWithWheels(createCatamaran()));
+    public void addWheelCatamaran() {carService.addExistingCar(new CatamaranWithWheels(createCatamaran()));
     }
 
     private Catamaran createCatamaran() {
         var engineCount = new Random().nextInt(3);
 
         return switch (engineCount) {
-            case 0 -> catamaranService.addCatamaran(handCatamaranFactory, EmptyEngineParams.DEFAULT);
-            case 1 -> catamaranService.addCatamaran(pedalCatamaranFactory, new PedalEngineParams(6));
-            case 2 -> catamaranService.addCatamaran(levitationCatamaranFactory, EmptyEngineParams.DEFAULT);
+            case 0 -> catamaranStorage.addCatamaran(handCatamaranFactory, EmptyEngineParams.DEFAULT);
+            case 1 -> catamaranStorage.addCatamaran(pedalCatamaranFactory, new PedalEngineParams(6));
+            case 2 -> catamaranStorage.addCatamaran(levitationCatamaranFactory, EmptyEngineParams.DEFAULT);
             default -> throw new RuntimeException("nonono");
         };
     }
@@ -124,22 +127,22 @@ public class Hse {
      *
      * @param pedalSize размер педалей (1-15)
      */
-    public Catamaran addPedalCatamaran(int pedalSize) {
-        return catamaranService.addCatamaran(pedalCatamaranFactory, new PedalEngineParams(pedalSize));
+    public void addPedalCatamaran(int pedalSize) {
+        catamaranStorage.addCatamaran(pedalCatamaranFactory, new PedalEngineParams(pedalSize));
     }
 
     /**
      * Добавляет катамаран с ручным приводом.
      */
-    public Catamaran addHandCatamaran() {
-        return catamaranService.addCatamaran(handCatamaranFactory, EmptyEngineParams.DEFAULT);
+    public void addHandCatamaran() {
+        catamaranStorage.addCatamaran(handCatamaranFactory, EmptyEngineParams.DEFAULT);
     }
 
     /**
      * Добавляет левитирующий катамаран.
      */
-    public Catamaran addLevitationCatamaran() {
-        return catamaranService.addCatamaran(levitationCatamaranFactory, EmptyEngineParams.DEFAULT);
+    public void addLevitationCatamaran() {
+        catamaranStorage.addCatamaran(levitationCatamaranFactory, EmptyEngineParams.DEFAULT);
     }
 
     /**
@@ -165,7 +168,7 @@ public class Hse {
     public void exportTransport(ReportFormat format, Writer writer) {
         List<Transport> transports = Stream.concat(
                 carService.getCars().stream(),
-                catamaranService.getCatamarans().stream())
+                catamaranStorage.getCatamarans().stream())
                 .toList();
         TransportExporter exporter = transportExporterFactory.create(format);
 

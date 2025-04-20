@@ -309,7 +309,7 @@ public class CarStorage implements CarProvider {
 }
 package hse.kpo.storages;
 
-import hse.kpo.domains.catamarans.Catamaran;
+import hse.kpo.domains.Catamaran;
 import hse.kpo.domains.Customer;
 import hse.kpo.interfaces.catamarans.CatamaranFactory;
 import hse.kpo.interfaces.catamarans.CatamaranProvider;
@@ -712,8 +712,8 @@ public enum ReportFormat {
 }
 package hse.kpo.facade;
 
-import hse.kpo.domains.catamarans.Catamaran;
-import hse.kpo.domains.catamarans.CatamaranWithWheels;
+import hse.kpo.domains.Catamaran;
+import hse.kpo.domains.CatamaranWithWheels;
 import hse.kpo.domains.Customer;
 import hse.kpo.domains.Report;
 import hse.kpo.domains.cars.Car;
@@ -897,7 +897,7 @@ public class Hse {
     }
 }package hse.kpo.factories.catamarans;
 
-import hse.kpo.domains.catamarans.Catamaran;
+import hse.kpo.domains.Catamaran;
 import hse.kpo.domains.LevitationEngine;
 import hse.kpo.interfaces.catamarans.CatamaranFactory;
 import hse.kpo.params.EmptyEngineParams;
@@ -917,7 +917,7 @@ public class LevitationCatamaranFactory implements CatamaranFactory<EmptyEngineP
 }
 package hse.kpo.factories.catamarans;
 
-import hse.kpo.domains.catamarans.Catamaran;
+import hse.kpo.domains.Catamaran;
 import hse.kpo.domains.HandEngine;
 import hse.kpo.interfaces.catamarans.CatamaranFactory;
 import hse.kpo.params.EmptyEngineParams;
@@ -938,7 +938,7 @@ public class HandCatamaranFactory implements CatamaranFactory<EmptyEngineParams>
 package hse.kpo.factories.catamarans;
 
 
-import hse.kpo.domains.catamarans.Catamaran;
+import hse.kpo.domains.Catamaran;
 import hse.kpo.domains.PedalEngine;
 import hse.kpo.interfaces.catamarans.CatamaranFactory;
 import hse.kpo.params.PedalEngineParams;
@@ -1515,7 +1515,7 @@ public class HseCarService {
     }
 }package hse.kpo.interfaces.catamarans;
 
-import hse.kpo.domains.catamarans.Catamaran;
+import hse.kpo.domains.Catamaran;
 
 /**
  * Интерфейс для определения методов фабрик.
@@ -1534,7 +1534,7 @@ public interface CatamaranFactory<T> {
 }
 package hse.kpo.interfaces.catamarans;
 
-import hse.kpo.domains.catamarans.Catamaran;
+import hse.kpo.domains.Catamaran;
 import hse.kpo.domains.Customer;
 
 public interface CatamaranProvider {
