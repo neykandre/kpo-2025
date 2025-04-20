@@ -193,11 +193,6 @@ transport.getEngineType()
 )
 ```
 
-List<Transport> transports = Stream.concat(
-carStorage.getCars().stream(),
-catamaranStorage.getCatamarans().stream())
-.toList();
-
 <details> 
 <summary>Ссылки</summary>
 1. 
