@@ -53,6 +53,9 @@ hse.sell();
 System.out.println(hse.generateReport());
 ```
 
+
+
+
 <details> 
 <summary>Ссылки</summary>
 1. 
