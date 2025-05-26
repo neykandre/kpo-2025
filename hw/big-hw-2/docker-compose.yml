@@ -1,0 +1,83 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_DB: files_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - app-net
+
+  file-service:
+    build:
+      context: ./file-storing-service
+      dockerfile: Dockerfile
+    image: file-service:1.0
+    restart: on-failure
+    depends_on:
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/files_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SERVER_PORT: 8080
+    volumes:
+      - files-volume:/data/files
+    networks:
+      - app-net
+
+  analysis-db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_DB: analysis_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - analysis-db-data:/var/lib/postgresql/data
+    networks:
+      - app-net
+
+  analysis-service:
+    build:
+      context: ./file-analysis-service
+      dockerfile: Dockerfile
+    image: analysis-service:1.0
+    restart: on-failure
+    depends_on:
+      - analysis-db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://analysis-db:5432/analysis_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SERVER_PORT: 8080
+    networks:
+      - app-net
+
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    image: api-gateway:1.0
+    restart: on-failure
+    depends_on:
+      - file-service
+    environment:
+      SERVER_PORT: 8080
+    ports:
+      - "8080:8080"
+    networks:
+      - app-net
+
+volumes:
+  db-data:
+  files-volume:
+  analysis-db-data:
+
+networks:
+  app-net:
+    driver: bridge
