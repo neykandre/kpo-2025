@@ -1,0 +1,10 @@
+server:
+  port: 8080
+
+app:
+  orders-base-url: ${GATEWAY_ORDERS_URI:http://orders-service:8080}
+  payments-base-url: ${GATEWAY_PAYMENTS_URI:http://payments-service:8081}
+
+springdoc:
+  api-docs.path: /v3/api-docs
+  swagger-ui.path: /swagger-ui.html

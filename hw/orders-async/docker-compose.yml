@@ -1,0 +1,117 @@
+version: "3.9"
+
+networks:
+  app-net:
+    driver: bridge
+
+services:
+  zookeeper:
+    image: bitnami/zookeeper:3.8
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    ports:
+      - "2181:2181"
+    networks:
+      - app-net
+
+  kafka:
+    image: bitnami/kafka:3.3
+    depends_on:
+      - zookeeper
+    restart: always
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE: "true"
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    networks:
+      - app-net
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    ports:
+      - "8085:8080"
+    environment:
+      - KAFKA_CLUSTERS_0_NAME=local
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092, localhost:9092, localhost:29092
+    depends_on:
+      - kafka
+    networks:
+      - app-net
+
+  orders-db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_DB: orders_db
+      POSTGRES_USER: shop
+      POSTGRES_PASSWORD: shop
+    volumes:
+      - orders-data:/var/lib/postgresql/data
+    networks:
+      - app-net
+
+  payments-db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_DB: payments_db
+      POSTGRES_USER: shop
+      POSTGRES_PASSWORD: shop
+    volumes:
+      - payments-data:/var/lib/postgresql/data
+    networks:
+      - app-net
+
+  orders-service:
+    build: ./orders-service
+    depends_on:
+      - kafka
+      - orders-db
+    restart: on-failure
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://orders-db:5432/orders_db
+      SPRING_DATASOURCE_USERNAME: shop
+      SPRING_DATASOURCE_PASSWORD: shop
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    networks:
+      - app-net
+
+  payments-service:
+    build: ./payments-service
+    depends_on:
+      - kafka
+      - payments-db
+    restart: on-failure
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://payments-db:5432/payments_db
+      SPRING_DATASOURCE_USERNAME: shop
+      SPRING_DATASOURCE_PASSWORD: shop
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    networks:
+      - app-net
+
+  gateway-service:
+    build: ./gateway-service
+    depends_on:
+      - orders-service
+      - payments-service
+    restart: on-failure
+    environment:
+      GATEWAY_ORDERS_URI: http://orders-service:8082
+      GATEWAY_PAYMENTS_URI: http://payments-service:8081
+    ports:
+      - "8080:8080"
+    networks:
+      - app-net
+
+volumes:
+  orders-data:
+  payments-data:
